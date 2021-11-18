@@ -23,15 +23,15 @@
             // Create a linear scale
             const xScale = d3.scaleLinear()
                 .domain(x_extent) // Set the domain
-                .range([700, 100])     // Set the range
+                .range([100, 700])     // Set the range
             
             const yScale = d3.scaleLinear()
                 .domain(y_extent) // Set the domain
-                .range([400, 100])     // Set the range
+                .range([100, 400])     // Set the range
 
             const popScale = d3.scaleSqrt()
                 .domain(pop_extent)
-                .range([10, 200])
+                .range([10, 100])
 
             const countryScale = d3.scaleOrdinal()
                 .domain(countries)

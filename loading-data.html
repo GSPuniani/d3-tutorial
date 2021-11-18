@@ -15,30 +15,27 @@
         d3.csv('./data/cities.csv')
         .then(data => {
             // console.log(data)
-            const minX = d3.min(data, d => parseFloat(d.x))
-            const maxX = d3.max(data, d => parseFloat(d.x))
-            const minY = d3.min(data, d => parseFloat(d.y))
-            const maxY = d3.max(data, d => parseFloat(d.y))
-            const minPop = d3.min(data, d => d.population)
-            const maxPop = d3.max(data, d => d.population)
+            const x_extent = d3.extent(data, d => parseFloat(d.x))
+            const y_extent = d3.extent(data, d => parseFloat(d.y))
+            const pop_extent = d3.extent(data, d => d.population)
             const countries = Array.from(new Set(data.map(d => d.country)))
 
             // Create a linear scale
             const xScale = d3.scaleLinear()
-                .domain([minX, maxX]) // Set the domain
-                .range([0, 800])     // Set the range
+                .domain(x_extent) // Set the domain
+                .range([700, 100])     // Set the range
             
             const yScale = d3.scaleLinear()
-                .domain([minY, maxY]) // Set the domain
-                .range([0, 500])     // Set the range
+                .domain(y_extent) // Set the domain
+                .range([400, 100])     // Set the range
+
+            const popScale = d3.scaleSqrt()
+                .domain(pop_extent)
+                .range([10, 200])
 
             const countryScale = d3.scaleOrdinal()
                 .domain(countries)
                 .range(['cornflowerblue', 'gold', 'green', 'tomato'])
-
-            const popScale = d3.scaleSqrt()
-                .domain([minPop, maxPop])
-                .range([10, 200])
 
 
             d3.select('#svg')
@@ -54,8 +51,6 @@
                 .attr('opacity', 0.25)
                 .attr('r', d => popScale(d.population))
                 .attr('fill', d => countryScale(d.country))
-
-
         })
 
     </script>

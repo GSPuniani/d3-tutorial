@@ -89,6 +89,13 @@
                 })
                 .attr('stroke', '#000')
                 .attr('fill', 'none')
+
+            node
+                .append('text')
+                .text(d => (`${d.label}, ${d.country}`)) // set the text
+                .attr('x', 0)
+                .attr('y', d => 500 - 0.5 * yScale(d.y))
+
         })
 
     </script>

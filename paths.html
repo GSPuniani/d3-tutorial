@@ -37,30 +37,74 @@
 
             function handleData(data) {
                 // draw stuff here
+                const width = 600
+                const height = 400
+                const margin = 40
                 // console.log(getDataForState(data, 'SE'))
                 const baData = getDataForState(data, 'BA')
 
-                const xscale = d3.scaleLinear()
-                    .domain([0, baData.length]) // number of values
-                    .range([40, 560]) // width of #svg
+                // Dates are formatted: 30/11/2017
+                const parseTime = d3.timeParse('%d/%m/%Y')
+                // parse the dates for d3
+                baData.forEach(d => d.date = parseTime(d.date))
+                
+                // Find the extents of the dates
+                const dateExtent = d3.extent(baData, d => d.date)
+                // x scale 
+                const xscale = d3.scaleTime() // Make a time scale!
+                    .domain(dateExtent)
+                    .range([margin, width - margin]) // Use the width and margin!
+                    .nice() // Rounds the scale "nicely"
 
                 const precipitationExtents = d3.extent(baData, d => d.precipitation)
                 const yscale = d3.scaleLinear()
                     .domain(precipitationExtents)
-                    .range([360, 40])
+                    .range([height - margin, margin])
 
                 // line generator
                 const linegen = d3.line()
-                    .x((d, i) => xscale(i))
+                    .x(d => xscale(d.date))
                     .y(d => yscale(d.precipitation))
                     .curve(d3.curveLinear)
 
-                d3.select('#svg')
+                // Draw something on our svg
+                const svg = d3
+                    .select('#svg')
+                    // ends here nothing after .select()!
+
+                // Make a group for the graph
+                const graph = svg
+                    .append('g')
+                
+                // Use the group to append the path and generate a line.
+                graph
                     .append('path')
                     .attr('d', linegen(baData))
-                    .attr('stroke-width', 3)
+                    .attr('stroke-width', 1)
                     .attr('stroke', 'cornflowerblue')
                     .attr('fill', 'none')
+
+                // This makes generator
+                const bottomAxis = d3.axisBottom(xscale)
+                const leftAxis = d3.axisLeft(yscale)
+
+                // Append a group and add the bottom axis 
+                svg
+                    .append('g')
+                    // Position the group
+                    .attr('transform', `translate(0, ${height - margin})`)
+                    // generate the axis in the group
+                    .call(bottomAxis)
+
+                // Append the group and add the left axis
+                svg
+                    .append('g')
+                    .attr('transform', `translate(${margin}, 0)`)
+                    .call(leftAxis)
+
+
+
+
             }
             
             d3.csv('./data/precipitation.csv')

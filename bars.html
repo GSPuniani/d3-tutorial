@@ -25,11 +25,64 @@
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script>
             
-            d3.csv('./data/cities.csv')
-                .then(data => {
-                    
-                })
+            async function handleData() {
+                const data = await d3.csv('./data/cities.csv')
+                console.log(data)
+                const margin = { top: 10, right: 10, bottom: 20, left: 70 }
+                const width = 600 - (margin.left + margin.right)
+                const height = 400 - (margin.top + margin.bottom)
 
+                // x scale 
+                const xscale = d3.scaleBand()
+                    .domain(data.map(d => d.label))
+                    .range([margin.left, width + margin.left])
+                    .padding(0.05)
+
+                // y scale 
+                const popExtent = d3.extent(data, d => d.population)
+                const yscale = d3.scaleLinear()
+                    .domain(popExtent)
+                    .range([height - margin.bottom, margin.top])
+
+                // Select the SVG
+                const svg = d3.select('#svg')
+
+                const barGroup = svg.append('g')
+
+                // Make the bars
+                barGroup 
+                    .selectAll('rect')
+                    .data(data)
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'bar')
+                    .attr('x', (d, i) => xscale(d.label))
+                    .attr('y', d => yscale(d.population))
+                    .attr('width', xscale.bandwidth())
+                    .attr('height', d => height - yscale(d.population))
+
+
+                const bottomAxis = d3.axisBottom(xscale)
+                svg
+                    .append('g')
+                    .attr('transform', `translate(${0}, ${height})`)
+                    .call(bottomAxis)
+
+                const leftAxis = d3.axisLeft(yscale)
+                    .tickFormat(d3.format('.2s')) // Format the axis
+                    .ticks(12) // Set the number of ticks
+                    .tickSize(-width) // Set the width of the ticks
+                svg
+                    .append('g')
+                    .attr('transform', `translate(${margin.left}, 0)`)
+                    .call(leftAxis)
+
+
+
+
+            }
+
+            handleData()
             
 
         </script>
